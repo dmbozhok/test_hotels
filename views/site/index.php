@@ -1,53 +1,65 @@
 <?php
+/**
+ * @var yii\web\View $this
+ * @var \app\models\SearchRooms $searchModel
+ * @var array|null $models
+ */
 
-/** @var yii\web\View $this */
+use yii\bootstrap4\ActiveForm;
+use yii\bootstrap4\Html;
+use yii\helpers\ArrayHelper;
 
-$this->title = 'My Yii Application';
+$this->title = 'Главная';
+$cats = ArrayHelper::map(\app\models\RoomCategory::find()->asArray()->all(), 'id', 'name');
 ?>
 <div class="site-index">
+    <?php $form = ActiveForm::begin([
+        'id' => 'search-rooms',
+        'method' => 'get',
+        //'enableClientValidation' => false,
+        'enableAjaxValidation' => false,
+    ]);
+    ?>
+    <div class="">
+        <?= $form->field($searchModel, 'from')->input('date', [
+            'class' => 'form-control', 'required' => 'required', 'autocomplete' => 'off',
+        ])->label('Дата с') ?>
 
-    <div class="jumbotron text-center bg-transparent">
-        <h1 class="display-4">Congratulations!</h1>
+        <?= $form->field($searchModel, 'to')->input('date', [
+            'class' => 'form-control', 'required' => 'required', 'autocomplete' => 'off',
+        ])->label('Дата по') ?>
 
-        <p class="lead">You have successfully created your Yii-powered application.</p>
+        <?= $form->field($searchModel, 'category')->dropDownList($cats,
+            ['prompt' => '', 'class' => 'form-control', 'required' => 'required', 'autocomplete' => 'off',
+        ])->label('Категория номера');
+        ?>
 
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+        <?= Html::submitButton('Поиск', ['class' => 'btn btn-success']); ?>
     </div>
-
-    <div class="body-content">
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
-        </div>
-
+    <?php ActiveForm::end() ?>
+    <div class="mt-4">
+        <?php if ($models) { ?>
+            <?php foreach ($models as $data) { ?>
+                <div class="border rounded mb-2 row">
+                    <div class="col-3">
+                        <div>Номер № <?= $data['room_id'] ?></div>
+                        <div><?= $data['room_name'] ?></div>
+                        <?php if ($data['status'] == 0) { ?>
+                            <a href="/booking/book?id=<?= $data['id']?>" class="btn btn-info">Забронировать</a>
+                        <?php } ?>
+                    </div>
+                    <div class="col-9">
+                        <table class="table table-striped table-hover table-bordered">
+                            <tr><td>С</td><td><?= date('d.m.Y', $data['from']); ?></td></tr>
+                            <tr><td>По</td><td><?= date('d.m.Y', $data['to']); ?></td></tr>
+                            <tr><td>Цена</td><td><?= $data['price'] ?></td></tr>
+                            <tr><td>Статус</td><td><?= $data['status'] == 0 ? 'Свободно' : 'Занято' ?></td></tr>
+                        </table>
+                    </div>
+                </div>
+            <?php }  ?>
+        <?php } else if ($searchModel->search) { ?>
+            Ничего не найдено
+        <?php } ?>
     </div>
 </div>
