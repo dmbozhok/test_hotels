@@ -43,10 +43,10 @@ class SearchRooms extends \yii\base\Model
             $toTimestamp = strtotime($this->to); // фикс брони на один день больше, чем надо
             return Room::find()->alias('room')
                 ->select('category.name as room_name, activeRoomAggregateData.*')
-                ->where(['room.category_id' => $this->category])
+                ->filterWhere(['room.category_id' => $this->category])
                 ->innerJoinWith(['activeRoomAggregateData activeRoomAggregateData', 'category category'])
                 //->with('activeRoomAggregateData')
-                ->andWhere(['activeRoomAggregateData.from' => $fromTimestamp, 'activeRoomAggregateData.to' => $toTimestamp])
+                ->andFilterWhere(['activeRoomAggregateData.from' => $fromTimestamp, 'activeRoomAggregateData.to' => $toTimestamp])
                 //->limit(15)->offset(0)
                 ->asArray()->all();
         } else {

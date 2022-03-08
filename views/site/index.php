@@ -30,7 +30,7 @@ $cats = ArrayHelper::map(\app\models\RoomCategory::find()->asArray()->all(), 'id
         ])->label('Дата по') ?>
 
         <?= $form->field($searchModel, 'category')->dropDownList($cats,
-            ['prompt' => '', 'class' => 'form-control', 'required' => 'required', 'autocomplete' => 'off',
+            ['prompt' => '', 'class' => 'form-control', 'autocomplete' => 'off',
         ])->label('Категория номера');
         ?>
 
